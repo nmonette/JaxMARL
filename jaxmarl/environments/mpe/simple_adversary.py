@@ -15,6 +15,7 @@ class SimpleAdversaryMPE(SimpleMPE):
         num_adversaries=1,
         num_obs=2,
         action_type=DISCRETE_ACT,
+        zero_sum=False
     ):
         dim_c = 2  # NOTE follows code rather than docs
 
@@ -27,6 +28,8 @@ class SimpleAdversaryMPE(SimpleMPE):
         self.adversaries = ["adversary_{}".format(i) for i in range(num_adversaries)]
         self.good_agents = ["agent_{}".format(i) for i in range(num_good_agents)]
         agents = self.adversaries + self.good_agents
+
+        self.zero_sum = zero_sum
 
         landmarks = ["landmark {}".format(i) for i in range(num_obs)]
 
@@ -155,9 +158,12 @@ class SimpleAdversaryMPE(SimpleMPE):
         good_rew = adv_rew + pos_rew
 
         def _ad(aidx):
-            return -1 * jnp.linalg.norm(
-                state.p_pos[aidx] - state.p_pos[state.goal + self.num_agents]
-            )
+            if self.zero_sum:
+                return -1 * good_rew
+            else:
+                return -1 * jnp.linalg.norm(
+                    state.p_pos[aidx] - state.p_pos[state.goal + self.num_agents]
+                )
 
         rew = {a: _ad(i) for i, a in enumerate(self.adversaries)}
         rew.update({a: good_rew for a in self.good_agents})
