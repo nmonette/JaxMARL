@@ -121,7 +121,7 @@ class SimpleMPE(MultiAgentEnv):
             assert (
                 len(self.rad) == self.num_entities
             ), f"Rad array length {len(self.rad)} does not match number of entities {self.num_entities}"
-            assert jnp.all(self.rad > 0), f"Rad array must be positive, got {self.rad}"
+           #  assert jnp.all(self.rad > 0), f"Rad array must be positive, got {self.rad}"
         else:
             self.rad = jnp.concatenate(
                 [jnp.full((self.num_agents), 0.15), jnp.full((self.num_landmarks), 0.2)]
